@@ -1,17 +1,20 @@
 import asyncio
 
-from temporalio import activity, workflow
 from temporalio.client import Client
 from temporalio.worker import Worker
 
 from activities.hello import say_hello
 from workflows.hello import SayHello
 
+
 async def main():
     client = await Client.connect("localhost:7233", namespace="default")
     # Run the worker
     worker = Worker(
-        client, task_queue="hello-task-queue", workflows=[SayHello], activities=[say_hello]
+        client,
+        task_queue="hello-task-queue",
+        workflows=[SayHello],
+        activities=[say_hello],
     )
     await worker.run()
 

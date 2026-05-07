@@ -5,6 +5,7 @@ from temporalio import workflow
 with workflow.unsafe.imports_passed_through():
     from activities.hello import say_hello
 
+
 @workflow.defn
 class SayHello:
     @workflow.run
