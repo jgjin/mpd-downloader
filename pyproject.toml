@@ -1,0 +1,8 @@
+[project]
+name = "jff-downloader"
+version = "0.1.0"
+description = ""
+requires-python = ">=3.11"
+dependencies = [
+    "temporalio>=1.27.0",
+]
