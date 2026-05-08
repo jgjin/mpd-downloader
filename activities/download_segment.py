@@ -1,7 +1,9 @@
+import requests
 import structlog
 from temporalio import activity
 
 from schemas.video import SegmentToDownload
+from storage.get_storage import get_storage
 
 logger = structlog.get_logger()
 
@@ -13,12 +15,10 @@ async def download_segment(segment_to_download: SegmentToDownload) -> str:
     index = segment_to_download.index
     download_url = segment_to_download.download_url
 
-    logger.info(
-        "downloading segment",
-        video_id=video_id,
-        content_type=content_type,
-        index=index,
-        download_url=download_url,
-    )
+    response = requests.get(download_url, stream=True)
+    response.raise_for_status()
 
-    return "downloaded_path"
+    target_path = f"segments/{video_id}/{content_type}/{index}.m4s"
+    downloaded_path = get_storage().write_file(response, target_path)
+
+    return downloaded_path

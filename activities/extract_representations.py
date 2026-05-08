@@ -15,10 +15,11 @@ async def extract_representations(
     video_id = video_to_download.id
     mpd_path = video_to_download.mpd_path
 
-    mpd_content = get_storage().read_file(mpd_path)
-    if not mpd_content:
+    mpd_stream = get_storage().read_file(mpd_path)
+    if not mpd_stream:
         raise ValueError(f"no content at {mpd_path}")
-    mpd = Parser.from_string(mpd_content)
+    with mpd_stream:
+        mpd = Parser.from_string(mpd_stream.read().decode("utf-8"))
 
     if not mpd.base_urls:
         raise ValueError(f"no base URLs found in {mpd_path}")
