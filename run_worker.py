@@ -4,10 +4,13 @@ import structlog
 from temporalio.client import Client
 from temporalio.worker import Worker
 
+from activities.concatenate_segments import concatenate_segments
+from activities.decrypt_representation import decrypt_representation
 from activities.download_segment import download_segment
 from activities.extract_segments import extract_segments
+from activities.get_clearkey import get_clearkey
 from activities.list_videos import list_videos
-from activities.stitch_segments import stitch_segments
+from activities.merge_representations import merge_representations
 from workflows.download_video import DownloadVideo
 from workflows.download_videos import DownloadVideos
 
@@ -22,9 +25,12 @@ async def main():
         workflows=[DownloadVideos, DownloadVideo],
         activities=[
             list_videos,
+            get_clearkey,
             extract_segments,
             download_segment,
-            stitch_segments,
+            concatenate_segments,
+            decrypt_representation,
+            merge_representations,
         ],
     )
 
