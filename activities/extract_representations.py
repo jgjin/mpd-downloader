@@ -17,7 +17,7 @@ async def extract_representations(
 
     mpd_stream = get_storage().read_file(mpd_path)
     if not mpd_stream:
-        raise ValueError(f"no content at {mpd_path}")
+        raise ValueError(f"no MPD content at {mpd_path}")
     with mpd_stream:
         mpd = Parser.from_string(mpd_stream.read().decode("utf-8"))
 
