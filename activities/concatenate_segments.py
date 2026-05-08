@@ -1,7 +1,7 @@
 import structlog
 from temporalio import activity
 
-from schemas.video import ConcatenatedRepresentation, ContentType, DownloadedSegment
+from schemas.video import ConcatenatedRepresentation, ContentType
 
 logger = structlog.get_logger()
 
@@ -10,13 +10,13 @@ logger = structlog.get_logger()
 async def concatenate_segments(
     video_id: str,
     content_type: ContentType,
-    downloaded_segments: list[DownloadedSegment],
+    downloaded_paths: list[str],
 ) -> ConcatenatedRepresentation:
     logger.info(
         "concatenating segments",
         video_id=video_id,
         content_type=content_type,
-        count=len(downloaded_segments),
+        count=len(downloaded_paths),
     )
 
     return ConcatenatedRepresentation(

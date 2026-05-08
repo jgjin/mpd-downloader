@@ -4,14 +4,14 @@ from mpd_parser.models.composite_tags import Representation as RepresentationTag
 from mpd_parser.parser import Parser
 from temporalio import activity
 
-from schemas.video import ExtractedSegments, SegmentToDownload, VideoToDownload
+from schemas.video import ExtractedRepresentations, VideoToDownload
 from storage.get_storage import get_storage
 
 
 @activity.defn
-async def extract_segments(
+async def extract_representations(
     video_to_download: VideoToDownload,
-) -> ExtractedSegments:
+) -> ExtractedRepresentations:
     video_id = video_to_download.id
     mpd_path = video_to_download.mpd_path
 
@@ -39,30 +39,14 @@ async def extract_segments(
     if not best_audio_rep:
         raise ValueError(f"no audio representation found in {mpd_path}")
 
-    return ExtractedSegments(
+    return ExtractedRepresentations(
         video_id=video_id,
-        video_segments=[
-            SegmentToDownload(
-                video_id=video_id,
-                content_type="video",
-                index=index,
-                download_url=download_url,
-            )
-            for index, download_url in enumerate(
-                extract_segment_download_urls_from_rep(best_video_rep, base_url)
-            )
-        ],
-        audio_segments=[
-            SegmentToDownload(
-                video_id=video_id,
-                content_type="audio",
-                index=index,
-                download_url=download_url,
-            )
-            for index, download_url in enumerate(
-                extract_segment_download_urls_from_rep(best_audio_rep, base_url)
-            )
-        ],
+        video_segment_download_urls=extract_segment_download_urls_from_rep(
+            best_video_rep, base_url
+        ),
+        audio_segment_download_urls=extract_segment_download_urls_from_rep(
+            best_audio_rep, base_url
+        ),
     )
 
 

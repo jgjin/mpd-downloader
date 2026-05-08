@@ -7,10 +7,11 @@ from temporalio.worker import Worker
 from activities.concatenate_segments import concatenate_segments
 from activities.decrypt_representation import decrypt_representation
 from activities.download_segment import download_segment
-from activities.extract_segments import extract_segments
+from activities.extract_representations import extract_representations
 from activities.get_clearkey import get_clearkey
 from activities.list_videos import list_videos
 from activities.merge_representations import merge_representations
+from workflows.download_representation import DownloadRepresentation
 from workflows.download_video import DownloadVideo
 from workflows.download_videos import DownloadVideos
 
@@ -22,11 +23,11 @@ async def main():
     worker = Worker(
         client,
         task_queue="download-videos-task-queue",
-        workflows=[DownloadVideos, DownloadVideo],
+        workflows=[DownloadVideos, DownloadVideo, DownloadRepresentation],
         activities=[
             list_videos,
             get_clearkey,
-            extract_segments,
+            extract_representations,
             download_segment,
             concatenate_segments,
             decrypt_representation,

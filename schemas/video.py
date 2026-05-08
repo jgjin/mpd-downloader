@@ -16,7 +16,21 @@ class ClearKey(BaseModel):
     key_value: str
 
 
+class ExtractedRepresentations(BaseModel):
+    video_id: str
+
+    video_segment_download_urls: list[str]
+    audio_segment_download_urls: list[str]
+
+
 ContentType = Literal["video", "audio"]
+
+
+class Representation(BaseModel):
+    video_id: str
+    content_type: ContentType
+
+    segment_download_urls: list[str]
 
 
 class SegmentToDownload(BaseModel):
@@ -25,21 +39,6 @@ class SegmentToDownload(BaseModel):
     index: int
 
     download_url: str
-
-
-class ExtractedSegments(BaseModel):
-    video_id: str
-
-    video_segments: list[SegmentToDownload]
-    audio_segments: list[SegmentToDownload]
-
-
-class DownloadedSegment(BaseModel):
-    video_id: str
-    content_type: ContentType
-    index: int
-
-    downloaded_path: str
 
 
 class ConcatenatedRepresentation(BaseModel):
