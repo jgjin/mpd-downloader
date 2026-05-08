@@ -1,19 +1,26 @@
 import asyncio
 
-from workflows.hello import SayHello
+import structlog
 from temporalio.client import Client
+
+from schemas.video import DownloadedVideo
+from workflows.download_videos import DownloadVideos
 
 
 async def main():
-    # Create client connected to server at the given address
-    client = await Client.connect("localhost:7233")
+    logger = structlog.get_logger()
 
-    # Execute a workflow
-    result = await client.execute_workflow(
-        SayHello.run, "Temporal", id="hello-workflow", task_queue="hello-task-queue"
+    client = await Client.connect("localhost:7233")
+    downloaded_videos: list[DownloadedVideo] = await client.execute_workflow(
+        DownloadVideos.run,
+        id="download-videos",
+        task_queue="download-videos-task-queue",
     )
 
-    print(f"Result: {result}")
+    for video in downloaded_videos:
+        logger.info(
+            "downloaded video", video_id=video.id, downloaded_path=video.downloaded_path
+        )
 
 
 if __name__ == "__main__":
