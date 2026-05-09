@@ -27,7 +27,9 @@ async def merge_representations(
             av.open(
                 storage.read_file(audio_representation.decrypted_path), "r"
             ) as audio_input,
-            av.open(tmp_path, mode="w", format="mp4") as output,
+            av.open(
+                tmp_path, mode="w", format="mp4", options={"movflags": "faststart"}
+            ) as output,
         ):
             in_video_stream = next(s for s in video_input.streams if s.type == "video")
             out_video_stream = output.add_stream_from_template(in_video_stream)
@@ -44,7 +46,7 @@ async def merge_representations(
                 audio_input, in_audio_stream, out_audio_stream
             )
             for packet in heapq.merge(
-                video_packets, audio_packets, key=lambda p: p.dts
+                video_packets, audio_packets, key=lambda p: p.dts * p.time_base
             ):
                 output.mux(packet)
 

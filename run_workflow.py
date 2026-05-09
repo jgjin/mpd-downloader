@@ -1,8 +1,10 @@
 import asyncio
+import time
 
 import structlog
 from temporalio.client import Client
 
+from queues.task_queue import TaskQueue
 from schemas.video import DownloadedVideo
 from workflows.download_videos import DownloadVideos
 
@@ -13,8 +15,8 @@ async def main():
     client = await Client.connect("localhost:7233")
     downloaded_videos: list[DownloadedVideo] = await client.execute_workflow(
         DownloadVideos.run,
-        id="download-videos",
-        task_queue="download-videos-task-queue",
+        id=f"download-videos-{int(time.time())}",
+        task_queue=TaskQueue.SMALL_IO,
     )
 
     for video in downloaded_videos:

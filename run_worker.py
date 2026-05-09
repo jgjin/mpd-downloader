@@ -1,43 +1,40 @@
+import argparse
 import asyncio
 
 import structlog
 from temporalio.client import Client
 from temporalio.worker import Worker
 
-from activities.concatenate_segments import concatenate_segments
-from activities.decrypt_representation import decrypt_representation
-from activities.download_segment import download_segment
-from activities.extract_representations import extract_representations
-from activities.get_clearkey import get_clearkey
-from activities.list_videos import list_videos
-from activities.merge_representations import merge_representations
-from workflows.download_representation import DownloadRepresentation
-from workflows.download_video import DownloadVideo
-from workflows.download_videos import DownloadVideos
+from queues.mapping import QUEUE_MAPPING
+from queues.task_queue import TaskQueue
 
 
-async def main():
+async def main(task_queue: TaskQueue):
     logger = structlog.get_logger()
 
     client = await Client.connect("localhost:7233", namespace="default")
+    coverage = QUEUE_MAPPING[task_queue]
     worker = Worker(
         client,
-        task_queue="download-videos-task-queue",
-        workflows=[DownloadVideos, DownloadVideo, DownloadRepresentation],
-        activities=[
-            list_videos,
-            get_clearkey,
-            extract_representations,
-            download_segment,
-            concatenate_segments,
-            decrypt_representation,
-            merge_representations,
-        ],
+        task_queue=task_queue,
+        workflows=coverage.workflows,
+        activities=coverage.activities,
     )
 
-    logger.info("running worker")
+    logger.info("running worker", task_queue=task_queue)
     await worker.run()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    parser = argparse.ArgumentParser(
+        description="runs a Temporal worker for a specific task queue"
+    )
+    parser.add_argument(
+        "--task_queue",
+        type=str,
+        choices=[q.value for q in TaskQueue],
+        required=True,
+    )
+    args = parser.parse_args()
+
+    asyncio.run(main(TaskQueue(args.task_queue)))

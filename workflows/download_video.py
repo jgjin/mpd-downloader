@@ -9,6 +9,7 @@ with workflow.unsafe.imports_passed_through():
     from activities.extract_representations import extract_representations
     from activities.get_clearkey import get_clearkey
     from activities.merge_representations import merge_representations
+    from queues.task_queue import TaskQueue
     from schemas.video import DownloadedVideo, Representation, VideoToDownload
     from workflows.download_representation import DownloadRepresentation
 
@@ -53,11 +54,13 @@ class DownloadVideo:
                 decrypt_representation,
                 args=[concatenated_video_rep, clearkey],
                 start_to_close_timeout=timedelta(minutes=6),
+                task_queue=TaskQueue.LARGE_PROCESSING,
             ),
             workflow.execute_activity(
                 decrypt_representation,
                 args=[concatenated_audio_rep, clearkey],
                 start_to_close_timeout=timedelta(minutes=6),
+                task_queue=TaskQueue.LARGE_PROCESSING,
             ),
         )
 
@@ -65,4 +68,5 @@ class DownloadVideo:
             merge_representations,
             args=[video.id, decrypted_video_rep, decrypted_audio_rep],
             start_to_close_timeout=timedelta(minutes=6),
+            task_queue=TaskQueue.LARGE_PROCESSING,
         )
