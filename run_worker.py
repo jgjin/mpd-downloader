@@ -5,20 +5,20 @@ import structlog
 from temporalio.client import Client
 from temporalio.worker import Worker
 
-from queues.mapping import QUEUE_MAPPING
 from queues.task_queue import TaskQueue
+from queues.worker_config import QUEUE_WORKER_CONFIG
 
 
 async def main(task_queue: TaskQueue):
     logger = structlog.get_logger()
 
     client = await Client.connect("localhost:7233", namespace="default")
-    coverage = QUEUE_MAPPING[task_queue]
+    worker_config = QUEUE_WORKER_CONFIG[task_queue]
     worker = Worker(
         client,
         task_queue=task_queue,
-        workflows=coverage.workflows,
-        activities=coverage.activities,
+        workflows=worker_config.workflows,
+        activities=worker_config.activities,
     )
 
     logger.info("running worker", task_queue=task_queue)

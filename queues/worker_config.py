@@ -15,13 +15,13 @@ from workflows.download_videos import DownloadVideos
 
 
 @dataclass
-class QueueCoverage:
+class WorkerConfig:
     workflows: Sequence[type] = field(default_factory=list)
     activities: Sequence[Callable[..., Any]] = field(default_factory=list)
 
 
-QUEUE_MAPPING: Mapping[TaskQueue, QueueCoverage] = {
-    TaskQueue.SMALL_IO: QueueCoverage(
+QUEUE_WORKER_CONFIG: Mapping[TaskQueue, WorkerConfig] = {
+    TaskQueue.SMALL_IO: WorkerConfig(
         workflows=[DownloadVideos, DownloadVideo, DownloadRepresentation],
         activities=[
             list_videos,
@@ -31,7 +31,7 @@ QUEUE_MAPPING: Mapping[TaskQueue, QueueCoverage] = {
             concatenate_segments,
         ],
     ),
-    TaskQueue.LARGE_PROCESSING: QueueCoverage(
+    TaskQueue.LARGE_PROCESSING: WorkerConfig(
         activities=[
             decrypt_representation,
             merge_representations,
