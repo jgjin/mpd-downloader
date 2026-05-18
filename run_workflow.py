@@ -21,7 +21,10 @@ async def main():
 
     for video in downloaded_videos:
         logger.info(
-            "downloaded video", video_id=video.id, downloaded_path=video.downloaded_path
+            "downloaded video",
+            video_id=video.id,
+            storage_bucket_name=video.downloaded_storage_path.storage_bucket_name,
+            path=video.downloaded_storage_path.path,
         )
 
 

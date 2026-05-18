@@ -5,7 +5,7 @@ from mpd_parser.parser import Parser
 from temporalio import activity
 
 from schemas.video import ExtractedRepresentations, VideoToDownload
-from storage.get_storage import get_storage
+from storage.get_storage_bucket import get_storage_bucket
 
 
 @activity.defn
@@ -13,16 +13,18 @@ async def extract_representations(
     video_to_download: VideoToDownload,
 ) -> ExtractedRepresentations:
     video_id = video_to_download.id
-    mpd_path = video_to_download.mpd_path
+    mpd_storage_path = video_to_download.mpd_storage_path
 
-    mpd_stream = get_storage().read_file(mpd_path)
+    mpd_stream = get_storage_bucket(mpd_storage_path.storage_bucket_name).read_file(
+        mpd_storage_path.path
+    )
     if not mpd_stream:
-        raise ValueError(f"no MPD content at {mpd_path}")
+        raise ValueError(f"no MPD content to extract at {mpd_storage_path}")
     with mpd_stream:
         mpd = Parser.from_string(mpd_stream.read().decode("utf-8"))
 
     if not mpd.base_urls:
-        raise ValueError(f"no base URLs found in {mpd_path}")
+        raise ValueError(f"no base URLs found in {mpd_storage_path}")
     base_url = mpd.base_urls[0].text
 
     all_representations = []
@@ -33,12 +35,12 @@ async def extract_representations(
     video_reps = [r for r in all_representations if r.mime_type.startswith("video")]
     best_video_rep = max(video_reps, key=lambda r: r.bandwidth, default=None)
     if not best_video_rep:
-        raise ValueError(f"no video representation found in {mpd_path}")
+        raise ValueError(f"no video representation found in {mpd_storage_path}")
 
     audio_reps = [r for r in all_representations if r.mime_type.startswith("audio")]
     best_audio_rep = max(audio_reps, key=lambda r: r.bandwidth, default=None)
     if not best_audio_rep:
-        raise ValueError(f"no audio representation found in {mpd_path}")
+        raise ValueError(f"no audio representation found in {mpd_storage_path}")
 
     return ExtractedRepresentations(
         video_id=video_id,

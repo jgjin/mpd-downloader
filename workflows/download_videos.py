@@ -5,7 +5,8 @@ from temporalio import workflow
 
 with workflow.unsafe.imports_passed_through():
     from activities.list_videos import list_videos
-    from schemas.video import DownloadedVideo, VideoToDownload
+    from schemas.video import DownloadedVideo
+    from storage.storage_bucket_name import StorageBucketName
     from workflows.download_video import DownloadVideo
 
 
@@ -13,8 +14,9 @@ with workflow.unsafe.imports_passed_through():
 class DownloadVideos:
     @workflow.run
     async def run(self) -> list[DownloadedVideo]:
-        videos: list[VideoToDownload] = await workflow.execute_activity(
+        videos = await workflow.execute_activity(
             list_videos,
+            args=[StorageBucketName.MPDS],
             start_to_close_timeout=timedelta(minutes=6),
         )
 

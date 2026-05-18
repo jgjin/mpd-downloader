@@ -3,14 +3,19 @@ from datetime import timedelta
 
 from temporalio import workflow
 
-# Import activities and workflows, passing them through the sandbox without reloading the module
 with workflow.unsafe.imports_passed_through():
     from activities.decrypt_representation import decrypt_representation
     from activities.extract_representations import extract_representations
     from activities.get_clearkey import get_clearkey
     from activities.merge_representations import merge_representations
     from queues.task_queue import TaskQueue
-    from schemas.video import DownloadedVideo, Representation, VideoToDownload
+    from schemas.video import (
+        DownloadedVideo,
+        RepresentationsToMerge,
+        RepresentationToDownload,
+        VideoToDownload,
+    )
+    from storage.storage_bucket_name import StorageBucketName
     from workflows.download_representation import DownloadRepresentation
 
 
@@ -24,21 +29,24 @@ class DownloadVideo:
             start_to_close_timeout=timedelta(minutes=6),
         )
 
+        segments_storage_bucket = StorageBucketName.SEGMENTS
         concatenated_video_rep, concatenated_audio_rep = await asyncio.gather(
             workflow.execute_child_workflow(
                 DownloadRepresentation.run,
-                Representation(
+                RepresentationToDownload(
                     video_id=video.id,
                     content_type="video",
                     segment_download_urls=extracted_representations.video_segment_download_urls,
+                    storage_bucket_name=segments_storage_bucket,
                 ),
             ),
             workflow.execute_child_workflow(
                 DownloadRepresentation.run,
-                Representation(
+                RepresentationToDownload(
                     video_id=video.id,
                     content_type="audio",
                     segment_download_urls=extracted_representations.audio_segment_download_urls,
+                    storage_bucket_name=segments_storage_bucket,
                 ),
             ),
         )
@@ -66,7 +74,14 @@ class DownloadVideo:
 
         return await workflow.execute_activity(
             merge_representations,
-            args=[video.id, decrypted_video_rep, decrypted_audio_rep],
+            args=[
+                RepresentationsToMerge(
+                    video_id=video.id,
+                    video_representation_storage_path=decrypted_video_rep.decrypted_storage_path,
+                    audio_representation_storage_path=decrypted_audio_rep.decrypted_storage_path,
+                ),
+                StorageBucketName.VIDEOS,
+            ],
             start_to_close_timeout=timedelta(minutes=6),
             task_queue=TaskQueue.LARGE_PROCESSING,
         )

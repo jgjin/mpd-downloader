@@ -5,27 +5,35 @@ from typing import Generator
 import av
 from temporalio import activity
 
-from schemas.video import DecryptedRepresentation, DownloadedVideo
-from storage.get_storage import get_storage
+from schemas.storage import StoragePath
+from schemas.video import DownloadedVideo, RepresentationsToMerge
+from storage.get_storage_bucket import get_storage_bucket
+from storage.storage_bucket_name import StorageBucketName
 
 
 @activity.defn
 async def merge_representations(
-    video_id: str,
-    video_representation: DecryptedRepresentation,
-    audio_representation: DecryptedRepresentation,
+    representations_to_merge: RepresentationsToMerge,
+    storage_bucket_name: StorageBucketName,
 ) -> DownloadedVideo:
-    storage = get_storage()
+    video_id = representations_to_merge.video_id
+    video_rep_storage_path = representations_to_merge.video_representation_storage_path
+    audio_rep_storage_path = representations_to_merge.audio_representation_storage_path
 
     with tempfile.NamedTemporaryFile() as tmp:
         tmp_path = tmp.name
-
         with (
             av.open(
-                storage.read_file(video_representation.decrypted_path), "r"
+                get_storage_bucket(
+                    video_rep_storage_path.storage_bucket_name
+                ).read_file(video_rep_storage_path.path),
+                "r",
             ) as video_input,
             av.open(
-                storage.read_file(audio_representation.decrypted_path), "r"
+                get_storage_bucket(
+                    audio_rep_storage_path.storage_bucket_name
+                ).read_file(audio_rep_storage_path.path),
+                "r",
             ) as audio_input,
             av.open(
                 tmp_path, mode="w", format="mp4", options={"movflags": "faststart"}
@@ -50,13 +58,17 @@ async def merge_representations(
             ):
                 output.mux(packet)
 
-        target_path = f"videos/{video_id}.mp4"
+        storage_bucket = get_storage_bucket(storage_bucket_name)
+        target_path = f"{video_id}.mp4"
         with open(tmp_path, "rb") as readable_stream:
-            downloaded_path = storage.write_file(readable_stream, target_path)
+            downloaded_path = storage_bucket.write_file(readable_stream, target_path)
 
         return DownloadedVideo(
             id=video_id,
-            downloaded_path=downloaded_path,
+            downloaded_storage_path=StoragePath(
+                storage_bucket_name=storage_bucket_name,
+                path=downloaded_path,
+            ),
         )
 
 

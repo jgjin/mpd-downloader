@@ -8,7 +8,8 @@ with workflow.unsafe.imports_passed_through():
     from activities.download_segment import download_segment
     from schemas.video import (
         ConcatenatedRepresentation,
-        Representation,
+        RepresentationToDownload,
+        SegmentsToConcatenate,
         SegmentToDownload,
     )
 
@@ -16,16 +17,22 @@ with workflow.unsafe.imports_passed_through():
 @workflow.defn
 class DownloadRepresentation:
     @workflow.run
-    async def run(self, representation: Representation) -> ConcatenatedRepresentation:
+    async def run(
+        self, representation: RepresentationToDownload
+    ) -> ConcatenatedRepresentation:
+        storage_bucket_name = representation.storage_bucket_name
         download_each_segment = [
             workflow.execute_activity(
                 download_segment,
-                SegmentToDownload(
-                    video_id=representation.video_id,
-                    content_type=representation.content_type,
-                    index=index,
-                    download_url=download_url,
-                ),
+                args=[
+                    SegmentToDownload(
+                        video_id=representation.video_id,
+                        content_type=representation.content_type,
+                        index=index,
+                        download_url=download_url,
+                    ),
+                    storage_bucket_name,
+                ],
                 start_to_close_timeout=timedelta(minutes=6),
             )
             for index, download_url in enumerate(representation.segment_download_urls)
@@ -36,9 +43,12 @@ class DownloadRepresentation:
         return await workflow.execute_activity(
             concatenate_segments,
             args=[
-                representation.video_id,
-                representation.content_type,
-                downloaded_paths,
+                SegmentsToConcatenate(
+                    video_id=representation.video_id,
+                    content_type=representation.content_type,
+                    segment_paths=downloaded_paths,
+                ),
+                storage_bucket_name,
             ],
             start_to_close_timeout=timedelta(minutes=6),
         )

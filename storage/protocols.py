@@ -11,16 +11,10 @@ class ReadableStream(Protocol):
     def close(self) -> None:
         raise NotImplementedError
 
-    def __enter__(self) -> "ReadableStream":
-        return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
-
-
-class Storage(Protocol):
+class StorageBucket(Protocol):
     @abstractmethod
-    def list_directory(self, directory: str) -> list[str]:
+    def list_files(self) -> list[str]:
         raise NotImplementedError
 
     @abstractmethod
