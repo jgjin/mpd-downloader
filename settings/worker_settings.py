@@ -4,10 +4,10 @@ from queues.task_queue import TaskQueue
 
 
 class WorkerSettings(BaseSettings):
-    task_queue: TaskQueue
-
     temporal_host: str = "localhost:7233"
     temporal_namespace: str = "default"
+
+    task_queue: TaskQueue
 
     clearkey_id: str
     clearkey_value: str
@@ -15,4 +15,12 @@ class WorkerSettings(BaseSettings):
     shaka_packager_path: str
 
 
-global_instance = WorkerSettings()
+_global_instance: WorkerSettings | None = None
+
+
+def get_worker_settings() -> WorkerSettings:
+    global _global_instance
+    if _global_instance is None:
+        _global_instance = WorkerSettings()
+
+    return _global_instance

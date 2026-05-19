@@ -5,12 +5,11 @@ from temporalio.client import Client
 from temporalio.contrib.pydantic import pydantic_data_converter
 from temporalio.worker import Worker
 
-from queues.task_queue import TaskQueue
 from queues.worker_config import QUEUE_WORKER_CONFIG
-from settings.worker_settings import global_instance as worker_settings
+from settings.worker_settings import WorkerSettings, get_worker_settings
 
 
-async def main(task_queue: TaskQueue):
+async def main(worker_settings: WorkerSettings):
     logger = structlog.get_logger()
 
     client = await Client.connect(
@@ -18,6 +17,8 @@ async def main(task_queue: TaskQueue):
         namespace=worker_settings.temporal_namespace,
         data_converter=pydantic_data_converter,
     )
+
+    task_queue = worker_settings.task_queue
     worker_config = QUEUE_WORKER_CONFIG[task_queue]
     worker = Worker(
         client,
@@ -31,4 +32,6 @@ async def main(task_queue: TaskQueue):
 
 
 if __name__ == "__main__":
-    asyncio.run(main(worker_settings.task_queue))
+    worker_settings = get_worker_settings()
+
+    asyncio.run(main(worker_settings))
