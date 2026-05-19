@@ -1,5 +1,4 @@
 import io
-import os
 import subprocess
 import tempfile
 
@@ -8,6 +7,7 @@ from temporalio import activity
 
 from schemas.storage import StoragePath
 from schemas.video import ClearKey, ConcatenatedRepresentation, DecryptedRepresentation
+from settings.worker_settings import global_instance as worker_settings
 from storage.get_storage_bucket import get_storage_bucket
 
 logger = structlog.get_logger()
@@ -41,7 +41,7 @@ async def decrypt_representation(
                 w.write(chunk)
 
         tmp_out_path = tmp_out.name
-        decrypt_command = [os.environ["SHAKA_PACKAGER_PATH"]]
+        decrypt_command = [worker_settings.shaka_packager_path]
         decrypt_command.append(
             ",".join(
                 [
