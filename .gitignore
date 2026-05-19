@@ -219,13 +219,9 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Initial MPD files
+# Local storage buckets
 mpds/
-
-# Intermediate segments
 segments/
-
-# Final videos
 videos/
 
 # Shaka Packager

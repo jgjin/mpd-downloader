@@ -1,5 +1,5 @@
-import argparse
 import asyncio
+import os
 
 import structlog
 from temporalio.client import Client
@@ -26,15 +26,6 @@ async def main(task_queue: TaskQueue):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="runs a Temporal worker for a specific task queue"
-    )
-    parser.add_argument(
-        "--task_queue",
-        type=str,
-        choices=[q.value for q in TaskQueue],
-        required=True,
-    )
-    args = parser.parse_args()
+    task_queue = TaskQueue(os.environ["TASK_QUEUE"])
 
-    asyncio.run(main(TaskQueue(args.task_queue)))
+    asyncio.run(main(task_queue))

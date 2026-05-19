@@ -8,7 +8,8 @@ from storage.storage_bucket_name import StorageBucketName
 
 @activity.defn
 async def download_segment(
-    segment_to_download: SegmentToDownload, storage_bucket_name: StorageBucketName
+    segment_to_download: SegmentToDownload,
+    storage_bucket_name: StorageBucketName,
 ) -> str:
     video_id = segment_to_download.video_id
     content_type = segment_to_download.content_type
