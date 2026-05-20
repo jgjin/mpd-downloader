@@ -2,10 +2,12 @@ import asyncio
 from datetime import timedelta
 
 from temporalio import workflow
+from temporalio.common import RetryPolicy
 
 with workflow.unsafe.imports_passed_through():
     from activities.concatenate_segments import concatenate_segments
     from activities.download_segment import download_segment
+    from errors.standard_retry_policy import standard_retry_policy
     from schemas.video import (
         ConcatenatedRepresentation,
         RepresentationToDownload,
@@ -34,6 +36,10 @@ class DownloadRepresentation:
                     storage_bucket_name,
                 ],
                 start_to_close_timeout=timedelta(minutes=6),
+                retry_policy=RetryPolicy(
+                    maximum_attempts=6,
+                    non_retryable_error_types=["HTTPClientError"],
+                ),
             )
             for index, download_url in enumerate(representation.segment_download_urls)
         ]
@@ -51,4 +57,5 @@ class DownloadRepresentation:
                 storage_bucket_name,
             ],
             start_to_close_timeout=timedelta(minutes=6),
+            retry_policy=standard_retry_policy,
         )

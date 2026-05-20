@@ -8,6 +8,7 @@ with workflow.unsafe.imports_passed_through():
     from activities.extract_representations import extract_representations
     from activities.get_clearkey import get_clearkey
     from activities.merge_representations import merge_representations
+    from errors.standard_retry_policy import standard_retry_policy
     from queues.task_queue import TaskQueue
     from schemas.video import (
         DownloadedVideo,
@@ -27,6 +28,7 @@ class DownloadVideo:
             extract_representations,
             video,
             start_to_close_timeout=timedelta(minutes=6),
+            retry_policy=standard_retry_policy,
         )
 
         segments_storage_bucket = StorageBucketName.SEGMENTS
@@ -55,6 +57,7 @@ class DownloadVideo:
             get_clearkey,
             video,
             start_to_close_timeout=timedelta(minutes=6),
+            retry_policy=standard_retry_policy,
         )
 
         decrypted_video_rep, decrypted_audio_rep = await asyncio.gather(
@@ -63,12 +66,14 @@ class DownloadVideo:
                 args=[concatenated_video_rep, clearkey],
                 start_to_close_timeout=timedelta(minutes=6),
                 task_queue=TaskQueue.LARGE_PROCESSING,
+                retry_policy=standard_retry_policy,
             ),
             workflow.execute_activity(
                 decrypt_representation,
                 args=[concatenated_audio_rep, clearkey],
                 start_to_close_timeout=timedelta(minutes=6),
                 task_queue=TaskQueue.LARGE_PROCESSING,
+                retry_policy=standard_retry_policy,
             ),
         )
 
@@ -84,4 +89,5 @@ class DownloadVideo:
             ],
             start_to_close_timeout=timedelta(minutes=6),
             task_queue=TaskQueue.LARGE_PROCESSING,
+            retry_policy=standard_retry_policy,
         )

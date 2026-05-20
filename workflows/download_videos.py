@@ -5,6 +5,7 @@ from temporalio import workflow
 
 with workflow.unsafe.imports_passed_through():
     from activities.list_videos import list_videos
+    from errors.standard_retry_policy import standard_retry_policy
     from schemas.video import DownloadedVideo
     from storage.storage_bucket_name import StorageBucketName
     from workflows.download_video import DownloadVideo
@@ -18,6 +19,7 @@ class DownloadVideos:
             list_videos,
             args=[StorageBucketName.MPDS],
             start_to_close_timeout=timedelta(minutes=6),
+            retry_policy=standard_retry_policy,
         )
 
         download_each_video = [
