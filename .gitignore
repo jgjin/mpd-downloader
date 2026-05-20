@@ -226,3 +226,6 @@ videos/
 
 # Shaka Packager
 packager-osx-arm64
+
+# .dockerignore file
+.dockerignore

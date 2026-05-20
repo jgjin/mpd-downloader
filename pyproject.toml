@@ -1,5 +1,5 @@
 [project]
-name = "jff-downloader"
+name = "mpd-downloader"
 version = "0.1.0"
 description = ""
 requires-python = ">=3.11"
