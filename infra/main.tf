@@ -28,9 +28,9 @@ module "images" {
   source = "./modules/images"
 }
 
-# module "authentication" {
-#   source = "./modules/authentication"
-# }
+module "authentication" {
+  source = "./modules/authentication"
+}
 
 # module "storage" {
 #   source                = "./modules/storage"
@@ -45,7 +45,6 @@ module "images" {
 #   db_security_group_id      = module.network.temporal_database_sg_id
 #   db_username               = module.authentication.db_username
 #   db_password               = module.authentication.db_password
-#   db_name                   = module.authentication.db_name
 #   db_credentials_secret_arn = module.authentication.db_credentials_secret_arn
 #   service_discovery_arn     = module.network.frontend_service_discovery_arn
 #   execution_role_arn        = module.roles.task_execution_role_arn
