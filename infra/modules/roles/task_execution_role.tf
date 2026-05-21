@@ -10,7 +10,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
 
 resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
   name   = "ecs-task-execution-secrets"
-  role   = aws_iam_role.ecs_task_execution_role.id
+  role   = aws_iam_role.ecs_task_execution_role.name
   policy = data.aws_iam_policy_document.ecs_task_execution_secrets.json
 }
 

@@ -34,10 +34,10 @@ module "images" {
   docker_hub_credentials_secret_arn = module.authentication.docker_hub_credentials_secret_arn
 }
 
-# module "storage" {
-#   source                = "./modules/storage"
-#   worker_task_role_name = module.roles.worker_task_role_name
-# }
+module "storage" {
+  source                = "./modules/storage"
+  worker_task_role_name = module.roles.worker_task_role_name
+}
 
 # module "central_server" {
 #   source = "./modules/central_server"
@@ -64,7 +64,6 @@ module "images" {
 #   execution_role_arn       = module.roles.task_execution_role_arn
 #   worker_task_role_arn     = module.roles.worker_task_role_arn
 #   worker_image             = "${module.images.ecr_repository_url}:latest"
-#   bucket_names             = module.storage.bucket_names
 #   clearkey_id              = var.clearkey_id
 #   clearkey_value           = var.clearkey_value
 # }

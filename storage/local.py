@@ -4,7 +4,7 @@ from pathlib import Path
 from storage.protocols import ReadableStream, StorageBucket
 
 
-class LocalStorage(StorageBucket):
+class LocalStorageBucket(StorageBucket):
     def __init__(self, root: str):
         self.root = Path(root)
 
