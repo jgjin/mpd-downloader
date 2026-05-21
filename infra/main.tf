@@ -24,9 +24,9 @@ module "network" {
   my_ip  = var.my_ip
 }
 
-# module "images" {
-#   source = "./modules/images"
-# }
+module "images" {
+  source = "./modules/images"
+}
 
 # module "authentication" {
 #   source = "./modules/authentication"
@@ -62,7 +62,7 @@ module "network" {
 #   security_group_id        = module.network.temporal_worker_sg_id
 #   execution_role_arn       = module.roles.task_execution_role_arn
 #   worker_task_role_arn     = module.roles.worker_task_role_arn
-#   worker_image             = "${data.aws_caller_identity.current.account_id}.dkr.ecr.us-east-2.amazonaws.com/${module.images.worker_repository_name}:latest"
+#   worker_image             = "${module.images.ecr_repository_url}:latest"
 #   bucket_names             = module.storage.bucket_names
 #   clearkey_id              = var.clearkey_id
 #   clearkey_value           = var.clearkey_value
