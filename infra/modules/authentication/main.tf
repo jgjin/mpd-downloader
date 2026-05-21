@@ -1,10 +1,10 @@
 resource "random_pet" "db_username" {
-  length = 1
+  separator = "_"
 }
 
 resource "random_password" "db_password" {
   length  = 24
-  special = true
+  special = false
 }
 
 resource "aws_secretsmanager_secret" "db_credentials" {
@@ -20,6 +20,11 @@ resource "aws_secretsmanager_secret_version" "db_credentials" {
   })
 }
 
+resource "aws_secretsmanager_secret" "docker_hub_credentials" {
+  name        = "docker-hub-credentials"
+  description = "Docker Hub credentials"
+}
+
 output "db_credentials_secret_arn" {
   value = aws_secretsmanager_secret.db_credentials.arn
 }
@@ -31,4 +36,8 @@ output "db_username" {
 output "db_password" {
   value     = random_password.db_password.result
   sensitive = true
+}
+
+output "docker_hub_credentials_secret_arn" {
+  value = aws_secretsmanager_secret.docker_hub_credentials.arn
 }

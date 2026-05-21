@@ -1,22 +1,27 @@
 terraform {
-    required_providers {
-        aws = {
-            source = "hashicorp/aws"
-            version = "6.45.0"
-        }
-        random = {
-            source  = "hashicorp/random"
-            version = "3.9.0"
-        }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "6.45.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.9.0"
+    }
+  }
 }
 
 provider "aws" {
-    region = "us-east-2"
+  region = "us-east-2"
+}
+
+module "authentication" {
+  source = "./modules/authentication"
 }
 
 module "roles" {
-  source = "./modules/roles"
+  source                    = "./modules/roles"
+  db_credentials_secret_arn = module.authentication.db_credentials_secret_arn
 }
 
 module "network" {
@@ -25,11 +30,8 @@ module "network" {
 }
 
 module "images" {
-  source = "./modules/images"
-}
-
-module "authentication" {
-  source = "./modules/authentication"
+  source                            = "./modules/images"
+  docker_hub_credentials_secret_arn = module.authentication.docker_hub_credentials_secret_arn
 }
 
 # module "storage" {
