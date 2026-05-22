@@ -1,8 +1,8 @@
+# TODO: review resource sizing here
 resource "aws_ecs_task_definition" "temporal_server" {
   family                   = "temporal-server"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  # TODO: review resource sizing here
   cpu                      = 512
   memory                   = 1024
   execution_role_arn       = aws_iam_role.temporal_server_execution_role.arn
@@ -28,7 +28,7 @@ resource "aws_ecs_task_definition" "temporal_server" {
         log_driver = "awslogs"
         options = {
           "awslogs-group"         = "/ecs/temporal-server"
-          "awslogs-region"        = data.aws_region.current.name
+          "awslogs-region"        = data.aws_region.current.id
           "awslogs-stream-prefix" = "server"
           "awslogs-create-group"  = "true"
         }
@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "temporal_server" {
         log_driver = "awslogs"
         options = {
           "awslogs-group"         = "/ecs/temporal-server"
-          "awslogs-region"        = data.aws_region.current.name
+          "awslogs-region"        = data.aws_region.current.id
           "awslogs-stream-prefix" = "ui"
           "awslogs-create-group"  = "true"
         }
@@ -70,6 +70,6 @@ resource "aws_ecs_service" "temporal_server" {
   }
 
   service_registries {
-    registry_arn = var.service_discovery_arn
+    registry_arn = aws_service_discovery_service.frontend.arn
   }
 }

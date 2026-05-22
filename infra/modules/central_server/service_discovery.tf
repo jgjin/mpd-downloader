@@ -1,10 +1,9 @@
 resource "aws_service_discovery_private_dns_namespace" "temporal" {
   name        = "temporal.internal"
   description = "Private DNS for Temporal"
-  vpc         = data.aws_vpc.default.id
+  vpc         = var.vpc_id
 }
 
-# TODO: move into central_server module?
 resource "aws_service_discovery_service" "frontend" {
   name = "frontend"
 

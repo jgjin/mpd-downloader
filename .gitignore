@@ -229,3 +229,6 @@ packager-osx-arm64
 
 # .dockerignore file
 .dockerignore
+
+# Antigravity
+.antigravitycli/

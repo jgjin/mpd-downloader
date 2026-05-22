@@ -21,7 +21,3 @@ variable "cluster_id" {
 variable "subnet_ids" {
   type = list(string)
 }
-
-variable "service_discovery_arn" {
-  type = string
-}

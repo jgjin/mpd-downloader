@@ -15,12 +15,6 @@ provider "aws" {
   region = "us-east-2"
 }
 
-# TODO: move roles into their specific modules
-module "roles" {
-  source                    = "./modules/roles"
-  db_credentials_secret_arn = module.databases.db_credentials_secret_arn
-}
-
 module "network" {
   source = "./modules/network"
 }
@@ -42,40 +36,45 @@ module "clusters" {
 module "central_server" {
   source = "./modules/central_server"
 
-  vpc_id                            = module.network.vpc_id
+  vpc_id = module.network.vpc_id
+
   docker_hub_pull_through_cache_url = module.images.docker_hub_pull_through_cache_url
-  db_address                        = module.databases.db_address
-  db_credentials_secret_arn         = module.databases.db_credentials_secret_arn
-  cluster_id                        = module.clusters.temporal_cluster_id
-  subnet_ids                        = module.network.subnet_ids
-  service_discovery_arn             = module.network.frontend_service_discovery_arn
+
+  db_address                = module.databases.db_address
+  db_credentials_secret_arn = module.databases.db_credentials_secret_arn
+
+  cluster_id = module.clusters.temporal_cluster_id
+  subnet_ids = module.network.subnet_ids
 }
 
 module "storage" {
-  source                = "./modules/storage"
-  worker_task_role_name = module.roles.worker_task_role_name
+  source = "./modules/storage"
 }
 
-# module "worker_pools" {
-#   source = "./modules/worker_pools"
+module "worker_pools" {
+  source = "./modules/worker_pools"
 
-#   vpc_id                   = module.network.vpc_id
-#   server_security_group_id = module.central_server.temporal_server_sg_id
-#   cluster_id               = module.clusters.temporal_cluster_id
-#   subnet_ids               = module.network.subnet_ids
-#   security_group_id        = module.network.temporal_worker_sg_id
-#   execution_role_arn       = module.roles.task_execution_role_arn
-#   worker_task_role_arn     = module.roles.worker_task_role_arn
-#   worker_image             = "${module.images.ecr_repository_url}:latest"
-#   clearkey_id              = var.clearkey_id
-#   clearkey_value           = var.clearkey_value
-# }
+  vpc_id = module.network.vpc_id
+
+  worker_image = "${module.images.worker_ecr_repository_url}:latest"
+
+  clearkey_id    = var.clearkey_id
+  clearkey_value = var.clearkey_value
+
+  cluster_id = module.clusters.temporal_cluster_id
+  subnet_ids = module.network.subnet_ids
+
+  mpds_bucket_arn     = module.storage.mpds_bucket_arn
+  segments_bucket_arn = module.storage.segments_bucket_arn
+  videos_bucket_arn   = module.storage.videos_bucket_arn
+}
 
 module "traffic" {
   source = "./modules/traffic"
 
   temporal_database_sg_id = module.databases.temporal_database_sg_id
   temporal_server_sg_id   = module.central_server.temporal_server_sg_id
-  temporal_worker_sg_id   = module.network.temporal_worker_sg_id
-  my_ip                   = var.my_ip
+  temporal_worker_sg_id   = module.worker_pools.temporal_worker_sg_id
+
+  my_ip = var.my_ip
 }

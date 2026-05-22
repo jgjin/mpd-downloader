@@ -1,5 +1,5 @@
-resource "aws_ecr_repository" "mpd_downloader" {
-  name                 = "mpd-downloader"
+resource "aws_ecr_repository" "mpd_downloader_worker" {
+  name                 = "mpd-downloader-worker"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
@@ -8,8 +8,8 @@ resource "aws_ecr_repository" "mpd_downloader" {
 }
 
 resource "aws_secretsmanager_secret" "docker_hub_credentials" {
-  name        = "docker-hub-credentials"
-  description = "Docker Hub credentials"
+  name        = "ecr-pullthroughcache/docker-hub-credentials"
+  description = "Docker Hub credentials for ECR pull through cache"
 }
 
 resource "aws_ecr_pull_through_cache_rule" "docker_hub" {
