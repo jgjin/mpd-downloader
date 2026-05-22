@@ -4,6 +4,7 @@ resource "aws_service_discovery_private_dns_namespace" "temporal" {
   vpc         = data.aws_vpc.default.id
 }
 
+# TODO: move into central_server module?
 resource "aws_service_discovery_service" "frontend" {
   name = "frontend"
 
@@ -21,8 +22,4 @@ resource "aws_service_discovery_service" "frontend" {
   health_check_config {
     failure_threshold = 1
   }
-}
-
-output "frontend_service_discovery_arn" {
-  value = aws_service_discovery_service.frontend.arn
 }

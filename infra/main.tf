@@ -15,28 +15,24 @@ provider "aws" {
   region = "us-east-2"
 }
 
-module "authentication" {
-  source = "./modules/authentication"
-}
-
+# TODO: move roles into their specific modules
 module "roles" {
   source                    = "./modules/roles"
-  db_credentials_secret_arn = module.authentication.db_credentials_secret_arn
+  db_credentials_secret_arn = module.databases.db_credentials_secret_arn
 }
 
 module "network" {
   source = "./modules/network"
-  my_ip  = var.my_ip
 }
 
 module "images" {
-  source                            = "./modules/images"
-  docker_hub_credentials_secret_arn = module.authentication.docker_hub_credentials_secret_arn
+  source = "./modules/images"
 }
 
-module "storage" {
-  source                = "./modules/storage"
-  worker_task_role_name = module.roles.worker_task_role_name
+module "databases" {
+  source = "./modules/databases"
+
+  vpc_id = module.network.vpc_id
 }
 
 # module "central_server" {
@@ -44,14 +40,18 @@ module "storage" {
 
 #   subnet_ids                = module.network.subnet_ids
 #   security_group_id         = module.network.temporal_server_sg_id
-#   db_security_group_id      = module.network.temporal_database_sg_id
-#   db_username               = module.authentication.db_username
-#   db_password               = module.authentication.db_password
-#   db_credentials_secret_arn = module.authentication.db_credentials_secret_arn
+#   db_address                = module.databases.db_address
+#   db_username               = module.databases.db_username
+#   db_credentials_secret_arn = module.databases.db_credentials_secret_arn
 #   service_discovery_arn     = module.network.frontend_service_discovery_arn
 #   execution_role_arn        = module.roles.task_execution_role_arn
 #   server_task_role_arn      = module.roles.server_task_role_arn
 # }
+
+module "storage" {
+  source                = "./modules/storage"
+  worker_task_role_name = module.roles.worker_task_role_name
+}
 
 # module "worker_pools" {
 #   source = "./modules/worker_pools"
@@ -67,3 +67,12 @@ module "storage" {
 #   clearkey_id              = var.clearkey_id
 #   clearkey_value           = var.clearkey_value
 # }
+
+module "traffic" {
+  source = "./modules/traffic"
+
+  temporal_database_sg_id = module.databases.temporal_database_sg_id
+  temporal_server_sg_id   = module.network.temporal_server_sg_id
+  temporal_worker_sg_id   = module.network.temporal_worker_sg_id
+  my_ip                   = var.my_ip
+}

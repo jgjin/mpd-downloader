@@ -1,3 +1,4 @@
+# TODO: move copies into central_server and worker_pools modules?
 resource "aws_iam_role" "ecs_task_execution_role" {
   name               = "ecs-task-execution-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_tasks_assume_role.json
@@ -12,12 +13,4 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
   name   = "ecs-task-execution-secrets"
   role   = aws_iam_role.ecs_task_execution_role.name
   policy = data.aws_iam_policy_document.ecs_task_execution_secrets.json
-}
-
-output "task_execution_role_arn" {
-  value = aws_iam_role.ecs_task_execution_role.arn
-}
-
-output "task_execution_role_name" {
-  value = aws_iam_role.ecs_task_execution_role.name
 }
