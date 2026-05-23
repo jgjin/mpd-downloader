@@ -25,6 +25,7 @@ async def main(worker_settings: WorkerSettings):
         task_queue=task_queue,
         workflows=worker_config.workflows,
         activities=worker_config.activities,
+        max_concurrent_activities=worker_config.max_concurrent_activities,
     )
 
     logger.info("running worker", task_queue=task_queue)

@@ -1,12 +1,14 @@
-# TODO: review resource sizing here
 resource "aws_ecs_task_definition" "temporal_server" {
-  family                   = "temporal-server"
-  network_mode             = "awsvpc"
+  family = "temporal-server"
+
   requires_compatibilities = ["FARGATE"]
-  cpu                      = 512
-  memory                   = 1024
-  execution_role_arn       = aws_iam_role.temporal_server_execution_role.arn
-  task_role_arn            = aws_iam_role.temporal_server_task_role.arn
+  network_mode             = "awsvpc"
+
+  cpu    = 512
+  memory = 1024
+
+  execution_role_arn = aws_iam_role.temporal_server_execution_role.arn
+  task_role_arn      = aws_iam_role.temporal_server_task_role.arn
 
   container_definitions = jsonencode([
     {
@@ -57,11 +59,13 @@ resource "aws_ecs_task_definition" "temporal_server" {
 }
 
 resource "aws_ecs_service" "temporal_server" {
-  name            = "temporal-server"
-  cluster         = var.cluster_id
+  name = "temporal-server"
+
+  cluster = var.cluster_id
+
   task_definition = aws_ecs_task_definition.temporal_server.arn
-  desired_count   = 1
   launch_type     = "FARGATE"
+  desired_count   = 1
 
   network_configuration {
     subnets          = var.subnet_ids

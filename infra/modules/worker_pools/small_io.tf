@@ -1,12 +1,14 @@
-# TODO: review resource sizing here
 resource "aws_ecs_task_definition" "small_io" {
-  family                   = "temporal-worker-small-io"
-  network_mode             = "awsvpc"
+  family = "temporal-worker-small-io"
+
   requires_compatibilities = ["FARGATE"]
-  cpu                      = 1024
-  memory                   = 2048
-  execution_role_arn       = aws_iam_role.temporal_worker_execution_role.arn
-  task_role_arn            = aws_iam_role.temporal_worker_task_role.arn
+  network_mode             = "awsvpc"
+
+  cpu    = 512
+  memory = 1024
+
+  execution_role_arn = aws_iam_role.temporal_worker_execution_role.arn
+  task_role_arn      = aws_iam_role.temporal_worker_task_role.arn
 
   container_definitions = jsonencode([
     {
@@ -14,7 +16,8 @@ resource "aws_ecs_task_definition" "small_io" {
       image = var.worker_image
       environment = [
         { name = "TEMPORAL_HOST", value = "dns:///frontend.temporal.internal:7233" },
-        { name = "TASK_QUEUE", value = "small-io-queue" }
+        { name = "TASK_QUEUE", value = "small-io-queue" },
+        { name = "S3_BUCKET_SUFFIX", value = data.aws_caller_identity.current.account_id }
       ],
       secrets = [
         { name = "CLEARKEY_ID", value_from = "${aws_secretsmanager_secret.clearkey.arn}:clearkey_id::" },
@@ -34,11 +37,13 @@ resource "aws_ecs_task_definition" "small_io" {
 }
 
 resource "aws_ecs_service" "small_io" {
-  name            = "worker-small-io"
-  cluster         = var.cluster_id
+  name = "worker-small-io"
+
+  cluster = var.cluster_id
+
   task_definition = aws_ecs_task_definition.small_io.arn
-  desired_count   = 1
   launch_type     = "FARGATE"
+  desired_count   = 1
 
   network_configuration {
     subnets          = var.subnet_ids

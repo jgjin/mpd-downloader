@@ -19,6 +19,8 @@ class WorkerConfig:
     workflows: Sequence[type] = field(default_factory=list)
     activities: Sequence[Callable[..., Any]] = field(default_factory=list)
 
+    max_concurrent_activities: int
+
 
 QUEUE_WORKER_CONFIG: Mapping[TaskQueue, WorkerConfig] = {
     TaskQueue.SMALL_IO: WorkerConfig(
@@ -30,11 +32,13 @@ QUEUE_WORKER_CONFIG: Mapping[TaskQueue, WorkerConfig] = {
             download_segment,
             concatenate_segments,
         ],
+        max_concurrent_activities=30,
     ),
     TaskQueue.LARGE_PROCESSING: WorkerConfig(
         activities=[
             decrypt_representation,
             merge_representations,
         ],
+        max_concurrent_activities=1,
     ),
 }
