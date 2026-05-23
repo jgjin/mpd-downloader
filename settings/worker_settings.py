@@ -9,6 +9,8 @@ class WorkerSettings(BaseSettings):
 
     task_queue: TaskQueue
 
+    s3_bucket_suffix: str | None = None
+
     clearkey_id: str
     clearkey_value: str
 

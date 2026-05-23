@@ -1,5 +1,6 @@
 from abc import abstractmethod
-from typing import Protocol
+from types import TracebackType
+from typing import Protocol, Self, Type
 
 
 class ReadableStream(Protocol):
@@ -10,6 +11,19 @@ class ReadableStream(Protocol):
     @abstractmethod
     def close(self) -> None:
         raise NotImplementedError
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool | None:
+        self.close()
+
+        return None
 
 
 class StorageBucket(Protocol):

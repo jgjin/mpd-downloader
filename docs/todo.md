@@ -2,4 +2,5 @@
 This document lists TODOs for this repo not related to any particular piece of code.
 
 # TODOs
-- expose S3_BUCKET_SUFFIX in the worker settings to use in S3StorageBucket
+- figure out proper resource sizing for cpu, memory, and disk for ECS tasks
+- figure out how to properly scale worker pools

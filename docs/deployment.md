@@ -58,7 +58,7 @@ The worker compute layer security group allows traffic to the server compute lay
 For simplicity, tasks in the compute layers will get their own public IP addresses to make HTTPS requests to the public internet.
 
 ### Service discovery
-Let's use AWS Cloud Map. We'll create the `temporal.internal` namespace in the default virtual private cloud (VPC). Then we'll create the `frontend` service within `temporal.internal`. When we use that service's Amazon Resource Name (ARN) as the server's Amazon ECS service's service registry, and when we set the server's broadcast address to `frontend.temporal.internal`, then the server will register its IP address(es) under `frontend.temporal.internal`.
+Let's use AWS Cloud Map. We'll create the `temporal.internal` namespace in the default virtual private cloud (VPC). Then we'll create the `frontend` service within `temporal.internal`. When we use that service's Amazon Resource Name (ARN) as the server's Amazon ECS service's service registry, then the server will register its IP address(es) under `frontend.temporal.internal`.
 
 Now when workers in the same VPC query `dns:///frontend.temporal.internal`, it will resolve to the server's IP address(es).
 
