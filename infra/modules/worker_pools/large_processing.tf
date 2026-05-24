@@ -7,6 +7,11 @@ resource "aws_ecs_task_definition" "large_processing" {
   cpu    = 1024
   memory = 2048
 
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "ARM64"
+  }
+
   execution_role_arn = aws_iam_role.temporal_worker_execution_role.arn
   task_role_arn      = aws_iam_role.temporal_worker_task_role.arn
 

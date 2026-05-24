@@ -7,6 +7,11 @@ resource "aws_ecs_task_definition" "temporal_server" {
   cpu    = 512
   memory = 1024
 
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "ARM64"
+  }
+
   execution_role_arn = aws_iam_role.temporal_server_execution_role.arn
   task_role_arn      = aws_iam_role.temporal_server_task_role.arn
 

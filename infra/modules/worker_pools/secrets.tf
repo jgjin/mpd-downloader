@@ -1,6 +1,7 @@
 resource "aws_secretsmanager_secret" "clearkey" {
-  name        = "temporal-worker-clearkey"
-  description = "ClearKey for Temporal workers to use for decryption"
+  name                    = "temporal-worker-clearkey"
+  description             = "ClearKey for Temporal workers to use for decryption"
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "clearkey" {

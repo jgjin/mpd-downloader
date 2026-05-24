@@ -1,3 +1,9 @@
+variable "deploy_temporal_services" {
+  description = "Whether to deploy the Temporal services (central server, worker pools, and traffic configuration)"
+  type        = bool
+  default     = false
+}
+
 variable "my_ip" {
   description = "My public IP address for restricted access to the Temporal web UI"
   type        = string

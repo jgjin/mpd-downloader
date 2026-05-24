@@ -8,8 +8,9 @@ resource "aws_ecr_repository" "mpd_downloader_worker" {
 }
 
 resource "aws_secretsmanager_secret" "docker_hub_credentials" {
-  name        = "ecr-pullthroughcache/docker-hub-credentials"
-  description = "Docker Hub credentials for ECR pull through cache"
+  name                    = "ecr-pullthroughcache/docker-hub-credentials"
+  description             = "Docker Hub credentials for ECR pull through cache"
+  recovery_window_in_days = 0
 }
 
 resource "aws_ecr_pull_through_cache_rule" "docker_hub" {

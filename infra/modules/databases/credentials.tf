@@ -8,8 +8,9 @@ resource "random_password" "db_password" {
 }
 
 resource "aws_secretsmanager_secret" "db_credentials" {
-  name        = "temporal-db-credentials"
-  description = "Temporal database credentials"
+  name                    = "temporal-db-credentials"
+  description             = "Temporal database credentials"
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "db_credentials" {

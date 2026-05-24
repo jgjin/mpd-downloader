@@ -13,3 +13,11 @@ run-worker TASK_QUEUE:
         -v ./segments:/app/segments \
         -v ./videos:/app/videos \
         mpd-downloader-worker
+
+tofu *ARGS:
+    cd infra && env \
+      AWS_PROFILE="admin-profile" \
+      TF_VAR_my_ip=$(curl -s ipv4.ident.me) \
+      TF_VAR_clearkey_id="{{ env("CLEARKEY_ID") }}" \
+      TF_VAR_clearkey_value="{{ env("CLEARKEY_VALUE") }}" \
+      tofu {{ ARGS }}

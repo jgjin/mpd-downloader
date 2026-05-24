@@ -34,6 +34,7 @@ module "clusters" {
 }
 
 module "central_server" {
+  count  = var.deploy_temporal_services ? 1 : 0
   source = "./modules/central_server"
 
   vpc_id = module.network.vpc_id
@@ -52,6 +53,7 @@ module "storage" {
 }
 
 module "worker_pools" {
+  count  = var.deploy_temporal_services ? 1 : 0
   source = "./modules/worker_pools"
 
   vpc_id = module.network.vpc_id
@@ -70,11 +72,12 @@ module "worker_pools" {
 }
 
 module "traffic" {
+  count  = var.deploy_temporal_services ? 1 : 0
   source = "./modules/traffic"
 
   temporal_database_sg_id = module.databases.temporal_database_sg_id
-  temporal_server_sg_id   = module.central_server.temporal_server_sg_id
-  temporal_worker_sg_id   = module.worker_pools.temporal_worker_sg_id
+  temporal_server_sg_id   = var.deploy_temporal_services ? module.central_server[0].temporal_server_sg_id : null
+  temporal_worker_sg_id   = var.deploy_temporal_services ? module.worker_pools[0].temporal_worker_sg_id : null
 
   my_ip = var.my_ip
 }
