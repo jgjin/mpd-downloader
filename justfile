@@ -17,7 +17,9 @@ run-worker TASK_QUEUE:
 tofu *ARGS:
     cd infra && env \
       AWS_PROFILE="admin-profile" \
-      TF_VAR_my_ip=$(curl -s ipv4.ident.me) \
+      TF_VAR_docker_hub_username="{{ env("DOCKER_HUB_USERNAME") }}" \
+      TF_VAR_docker_hub_access_token="{{ env("DOCKER_HUB_ACCESS_TOKEN") }}" \
       TF_VAR_clearkey_id="{{ env("CLEARKEY_ID") }}" \
       TF_VAR_clearkey_value="{{ env("CLEARKEY_VALUE") }}" \
+      TF_VAR_my_ip=$(curl -s ipv4.ident.me) \
       tofu {{ ARGS }}

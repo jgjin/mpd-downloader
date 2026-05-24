@@ -16,4 +16,14 @@ data "aws_iam_policy_document" "temporal_server_execution_secrets" {
   }
 }
 
+data "aws_iam_policy_document" "temporal_server_execution_ecr" {
+  statement {
+    actions = [
+      "ecr:CreateRepository",
+      "ecr:BatchImportUpstreamImage"
+    ]
+    resources = ["*"]
+  }
+}
+
 data "aws_region" "current" {}

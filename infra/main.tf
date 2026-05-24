@@ -27,6 +27,9 @@ module "databases" {
 
 module "images" {
   source = "./modules/images"
+
+  docker_hub_username     = var.docker_hub_username
+  docker_hub_access_token = var.docker_hub_access_token
 }
 
 module "clusters" {

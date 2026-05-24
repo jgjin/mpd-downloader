@@ -14,6 +14,12 @@ resource "aws_iam_role_policy" "temporal_server_execution_secrets" {
   policy = data.aws_iam_policy_document.temporal_server_execution_secrets.json
 }
 
+resource "aws_iam_role_policy" "temporal_server_execution_ecr" {
+  name   = "temporal-server-execution-ecr"
+  role   = aws_iam_role.temporal_server_execution_role.name
+  policy = data.aws_iam_policy_document.temporal_server_execution_ecr.json
+}
+
 resource "aws_iam_role" "temporal_server_task_role" {
   name               = "temporal-server-task-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_tasks_assume_role.json
