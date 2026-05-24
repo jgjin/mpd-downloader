@@ -27,9 +27,9 @@ resource "aws_ecr_repository_creation_template" "docker_hub_pull_through_cache" 
     rules = [
       {
         rulePriority = 1
-        description  = "Cleans up untagged images older than 7 days"
+        description  = "Expires all images older than 7 days"
         selection = {
-          tagStatus   = "untagged"
+          tagStatus   = "any"
           countType   = "sinceImagePushed"
           countNumber = 7
           countUnit   = "days"
