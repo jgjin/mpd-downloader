@@ -17,8 +17,4 @@ resource "aws_service_discovery_service" "frontend" {
 
     routing_policy = "MULTIVALUE"
   }
-
-  health_check_config {
-    failure_threshold = 1
-  }
 }

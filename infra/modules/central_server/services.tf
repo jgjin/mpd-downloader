@@ -25,8 +25,8 @@ resource "aws_ecs_task_definition" "temporal_server" {
         { name = "POSTGRES_SEEDS", value = var.db_address },
       ],
       secrets = [
-        { name = "POSTGRES_USER", value_from = "${var.db_credentials_secret_arn}:username::" },
-        { name = "POSTGRES_PWD", value_from = "${var.db_credentials_secret_arn}:password::" }
+        { name = "POSTGRES_USER", valueFrom = "${var.db_credentials_secret_arn}:username::" },
+        { name = "POSTGRES_PWD", valueFrom = "${var.db_credentials_secret_arn}:password::" }
       ],
       port_mappings = [
         { containerPort = 7233, hostPort = 7233, protocol = "tcp" }

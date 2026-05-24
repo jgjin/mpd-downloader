@@ -25,8 +25,8 @@ resource "aws_ecs_task_definition" "small_io" {
         { name = "S3_BUCKET_SUFFIX", value = data.aws_caller_identity.current.account_id }
       ],
       secrets = [
-        { name = "CLEARKEY_ID", value_from = "${aws_secretsmanager_secret.clearkey.arn}:clearkey_id::" },
-        { name = "CLEARKEY_VALUE", value_from = "${aws_secretsmanager_secret.clearkey.arn}:clearkey_value::" }
+        { name = "CLEARKEY_ID", valueFrom = "${aws_secretsmanager_secret.clearkey.arn}:clearkey_id::" },
+        { name = "CLEARKEY_VALUE", valueFrom = "${aws_secretsmanager_secret.clearkey.arn}:clearkey_value::" }
       ],
       log_configuration = {
         log_driver = "awslogs"
